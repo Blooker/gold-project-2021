@@ -9,7 +9,7 @@ public class Unlitifier : MonoBehaviour
     private static Shader Lit;
     private static Shader Unlit;
     
-    [FormerlySerializedAs("materials")] [SerializeField] private Material[] Materials;
+    [SerializeField] private Material[] Materials;
 
     private bool IsLit = true;
     

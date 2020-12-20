@@ -7,7 +7,7 @@ public class CaptureManager : MonoBehaviour
 {
     [SerializeField] private Camera Cam;
 
-    [FormerlySerializedAs("CapturePositions")] [SerializeField] private CaptureArea[] CaptureAreas;
+    [SerializeField] private CaptureArea[] CaptureAreas;
     private int CaptureArea;
 
     [Header("Input")]

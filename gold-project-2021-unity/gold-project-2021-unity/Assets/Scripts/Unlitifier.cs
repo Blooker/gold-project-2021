@@ -6,43 +6,40 @@ using UnityEngine.Serialization;
 
 public class Unlitifier : MonoBehaviour
 {
-    private bool isLit = true;
-    private static Shader lit;
-    private static Shader unlit;
+    private static Shader Lit;
+    private static Shader Unlit;
     
-    [SerializeField] private Material[] materials;
+    [FormerlySerializedAs("materials")] [SerializeField] private Material[] Materials;
 
-    private Material[] litMaterials;
+    private bool IsLit = true;
     
     private void Awake()
     {
-        lit = Shader.Find("HDRP/Lit");
-        unlit = Shader.Find("HDRP/Unlit");
+        Lit = Shader.Find("HDRP/Lit");
+        Unlit = Shader.Find("HDRP/Unlit");
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        litMaterials = new Material[materials.Length];
-
-        for (int i = 0; i < materials.Length; i++)
+        for (int i = 0; i < Materials.Length; i++)
         {
-            materials[i].shader = lit;
-            litMaterials[i] = new Material(materials[i]);
+            Materials[i].shader = Lit;
+            var litMaterial = new Material(Materials[i]);
             
-            materials[i].SetColor("_UnlitColor", litMaterials[i].color);
-            materials[i].SetTexture("_UnlitColorMap",  litMaterials[i].mainTexture);
-            materials[i].SetTextureScale("_UnlitColorMap", litMaterials[i].mainTextureScale);
-            materials[i].SetTextureOffset("_UnlitColorMap", litMaterials[i].mainTextureOffset);
+            Materials[i].SetColor("_UnlitColor", litMaterial.color);
+            Materials[i].SetTexture("_UnlitColorMap",  litMaterial.mainTexture);
+            Materials[i].SetTextureScale("_UnlitColorMap", litMaterial.mainTextureScale);
+            Materials[i].SetTextureOffset("_UnlitColorMap", litMaterial.mainTextureOffset);
         }
     }
 
     void ToggleLit()
     {
-        isLit = !isLit;
-        for (int i = 0; i < materials.Length; i++)
+        IsLit = !IsLit;
+        for (int i = 0; i < Materials.Length; i++)
         {
-            materials[i].shader = isLit ? lit : unlit;
+            Materials[i].shader = IsLit ? Lit : Unlit;
         }
     }
     

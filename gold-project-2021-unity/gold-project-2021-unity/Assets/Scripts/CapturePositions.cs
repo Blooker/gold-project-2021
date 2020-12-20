@@ -7,11 +7,12 @@ public class CapturePositions : MonoBehaviour
 {
     [SerializeField] private Vector3 GridResolution;
 
-    private Vector3[] positions;
-
+    private Vector3[] Positions;
+    
+    
     private void Awake()
     {
-        positions = new Vector3[0];
+        Positions = new Vector3[0];
     }
 
     // Update is called once per frame
@@ -29,7 +30,7 @@ public class CapturePositions : MonoBehaviour
         int numY = (int)GridResolution.y;
         int numZ = (int)GridResolution.z;
         
-        positions = new Vector3[numX * numY * numZ];
+        Positions = new Vector3[numX * numY * numZ];
 
         var spacePos = transform.position;
         var spaceScale = transform.localScale;
@@ -46,7 +47,7 @@ public class CapturePositions : MonoBehaviour
                 for (int z = 0; z < numZ; z++)
                 {
                     var zPos = GetPoint(spacePos.z, spaceScale.z, z, numZ);
-                    positions[i++] = new Vector3(xPos, yPos, zPos);
+                    Positions[i++] = new Vector3(xPos, yPos, zPos);
                 }
             }
         }
@@ -68,9 +69,9 @@ public class CapturePositions : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < positions.Length; i++)
+        for (int i = 0; i < Positions.Length; i++)
         {
-            Gizmos.DrawSphere(positions[i], 0.2f);
+            Gizmos.DrawSphere(Positions[i], 0.2f);
         }
     }
 }

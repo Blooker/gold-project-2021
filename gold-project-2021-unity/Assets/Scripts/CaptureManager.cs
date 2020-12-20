@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 public class CaptureManager : MonoBehaviour
 {
-    [SerializeField] private Camera Cam;
+    [SerializeField] private CaptureCam Cam;
 
     [SerializeField] private CaptureArea[] CaptureAreas;
     private int CaptureArea;
@@ -13,6 +13,9 @@ public class CaptureManager : MonoBehaviour
     [Header("Input")]
     [SerializeField] private KeyCode ResetKey;
     [SerializeField] private KeyCode NextCamPosKey;
+
+    private bool Started = false;
+    private bool Finished = false;
     
     // Start is called before the first frame update
     void Start()
@@ -30,7 +33,7 @@ public class CaptureManager : MonoBehaviour
         
         if (Input.GetKeyDown(NextCamPosKey))
         {
-            NextCamPos();
+            Next();
         }
     }
 
@@ -42,9 +45,22 @@ public class CaptureManager : MonoBehaviour
         }
 
         CaptureArea = 0;
+        Started = false;
+    }
+
+    void Next()
+    {
+        Cam.NextRotation(out bool looped);
+
+        if (looped || !Started)
+        {
+            NextCamPos();
+        }
+
+        Started = true;
     }
     
-    public void NextCamPos()
+    void NextCamPos()
     {
         Vector3? pos;
         while (true)

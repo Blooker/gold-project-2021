@@ -33,7 +33,8 @@ public class CaptureArea : MonoBehaviour
         int numZ = (int)GridResolution.z;
         
         Positions = new Vector3[numX * numY * numZ];
-
+        Position = 0;
+        
         var spacePos = transform.position;
         var spaceScale = transform.localScale;
         

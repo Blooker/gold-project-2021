@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CapturePositions : MonoBehaviour
+public class CaptureArea : MonoBehaviour
 {
     [SerializeField] private Vector3 GridResolution;
 
+    private int Position;
     private Vector3[] Positions;
     
     
@@ -15,16 +16,17 @@ public class CapturePositions : MonoBehaviour
         Positions = new Vector3[0];
     }
 
-    // Update is called once per frame
-    void Update()
+    public Vector3? Next()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Position >= Positions.Length)
         {
-            Generate();
+            return null;
         }
-    }
 
-    void Generate()
+        return Positions[Position++];
+    }
+    
+    public void Generate()
     {
         int numX = (int)GridResolution.x;
         int numY = (int)GridResolution.y;

@@ -10,12 +10,15 @@ public class CaptureManager : MonoBehaviour
     [SerializeField] private CaptureArea[] CaptureAreas;
     private int CaptureArea;
 
+    [SerializeField] private bool Paused = false;
+    
     [Header("Input")]
     [SerializeField] private KeyCode ResetKey;
     [SerializeField] private KeyCode NextCamPosKey;
+    [SerializeField] private KeyCode PauseToggleKey;
 
     private bool Started = false;
-    private bool Finished = false;
+    
     
     // Start is called before the first frame update
     void Start()
@@ -26,12 +29,17 @@ public class CaptureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(PauseToggleKey))
+        {
+            Paused = !Paused;
+        }
+        
         if (Input.GetKeyDown(ResetKey))
         {
             Reset();
         }
         
-        if (Input.GetKeyDown(NextCamPosKey))
+        if (!Paused || Input.GetKeyDown(NextCamPosKey))
         {
             Next();
         }

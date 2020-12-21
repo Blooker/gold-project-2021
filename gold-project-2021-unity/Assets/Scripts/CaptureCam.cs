@@ -30,6 +30,11 @@ public class CaptureCam : MonoBehaviour
         UpdateRotation(RotationX++, RotationY);
     }
 
+    public void SetPosition(Vector3 pos)
+    {
+        transform.position = pos;
+    }
+    
     void UpdateRotation(int x, int y)
     {
         var xPercent = x / RotationResolution.x;

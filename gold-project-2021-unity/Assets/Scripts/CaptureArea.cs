@@ -16,11 +16,6 @@ public class CaptureArea : MonoBehaviour
         Positions = new Vector3[0];
     }
 
-    private void Start()
-    {
-        Generate();
-    }
-
     public Vector3? Next()
     {
         if (Position >= Positions.Length)

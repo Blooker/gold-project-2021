@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -6,9 +7,7 @@ using UnityEngine.Serialization;
 public class CaptureManager : MonoBehaviour
 {
     [SerializeField] private CaptureCam Cam;
-
-    [SerializeField] private CaptureArea[] CaptureAreas;
-    private int CaptureArea;
+    [SerializeField] private CaptureAreas Areas;
 
     [SerializeField] private bool Paused = false;
     
@@ -18,12 +17,10 @@ public class CaptureManager : MonoBehaviour
     [SerializeField] private KeyCode PauseToggleKey;
 
     private bool Started = false;
-    
-    
-    // Start is called before the first frame update
-    void Start()
+
+    private void Start()
     {
-        
+        Reset();
     }
 
     // Update is called once per frame
@@ -47,47 +44,33 @@ public class CaptureManager : MonoBehaviour
 
     public void Reset()
     {
-        for (int i = 0; i < CaptureAreas.Length; i++)
-        {
-            CaptureAreas[i].Generate();
-        }
+        Areas.GenerateAll();
 
-        CaptureArea = 0;
         Started = false;
+        Paused = true;
     }
 
     void Next()
     {
         Cam.NextRotation(out bool looped);
 
+        // If all of the possible cam rotations have been seen,
+        // or the capture run has just started, go to the next position
         if (looped || !Started)
         {
-            NextCamPos();
+            var pos = Areas.NextCamPos();
+
+            if (pos.HasValue)
+            {
+                Cam.SetPosition(pos.Value);
+            }
+            else
+            {
+                // We've reached the end, so Reset the capture run
+                Reset();
+            }
         }
 
         Started = true;
-    }
-    
-    void NextCamPos()
-    {
-        Vector3? pos;
-        while (true)
-        {
-            if (CaptureArea >= CaptureAreas.Length)
-            {
-                return;
-            }
-            
-            pos = CaptureAreas[CaptureArea].Next();
-            
-            if (pos.HasValue)
-            {
-                break;
-            }
-            
-            CaptureArea++;
-        }
-
-        Cam.transform.position = pos.Value;
     }
 }

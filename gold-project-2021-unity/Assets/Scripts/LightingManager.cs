@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Unlitifier : MonoBehaviour
+public class LightingManager : MonoBehaviour
 {
     private static Shader Lit;
     private static Shader Unlit;

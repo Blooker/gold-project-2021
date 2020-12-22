@@ -6,24 +6,27 @@ using UnityEngine;
 public class CaptureArea : MonoBehaviour
 {
     [SerializeField] private Vector3 GridResolution;
-
-    private int Position;
-    private Vector3[] Positions;
     
+    private Vector3[] Positions;
     
     private void Awake()
     {
         Positions = new Vector3[0];
     }
 
-    public Vector3? Next()
+    public Vector3? GetPos(int pos)
     {
-        if (Position >= Positions.Length)
+        if (pos >= Positions.Length)
         {
             return null;
         }
 
-        return Positions[Position++];
+        return Positions[pos];
+    }
+
+    public int NumPos()
+    {
+        return (int)GridResolution.x * (int)GridResolution.y * (int)GridResolution.z;
     }
     
     public void Generate()
@@ -33,7 +36,6 @@ public class CaptureArea : MonoBehaviour
         int numZ = (int)GridResolution.z;
         
         Positions = new Vector3[numX * numY * numZ];
-        Position = 0;
         
         var spacePos = transform.position;
         var spaceScale = transform.localScale;

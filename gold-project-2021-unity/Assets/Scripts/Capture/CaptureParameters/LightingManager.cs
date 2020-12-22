@@ -34,21 +34,17 @@ public class LightingManager : MonoBehaviour
         }
     }
 
-    void ToggleLit()
+    public void SetLit(bool isLit)
     {
-        IsLit = !IsLit;
+        if (IsLit == isLit)
+        {
+            return;
+        }
+        
+        IsLit = isLit;
         for (int i = 0; i < Materials.Length; i++)
         {
             Materials[i].shader = IsLit ? Lit : Unlit;
-        }
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            ToggleLit();
         }
     }
 }

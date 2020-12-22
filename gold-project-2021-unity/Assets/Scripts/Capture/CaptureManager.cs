@@ -6,8 +6,11 @@ using UnityEngine.Serialization;
 
 public class CaptureManager : MonoBehaviour
 {
+    [SerializeField] private CaptureStates States;
+    [SerializeField] private CaptureEnvironment Env;
+    [SerializeField] private CaptureParameters Params;
+    
     [SerializeField] private CaptureCam Cam;
-    [SerializeField] private CaptureAreas Areas;
 
     [SerializeField] private bool Paused = false;
     
@@ -17,10 +20,11 @@ public class CaptureManager : MonoBehaviour
     [SerializeField] private KeyCode PauseToggleKey;
 
     private bool Started = false;
+    private bool Finished = false;
 
     private void Start()
     {
-        Reset();
+        Initialise();
     }
 
     // Update is called once per frame
@@ -33,7 +37,7 @@ public class CaptureManager : MonoBehaviour
         
         if (Input.GetKeyDown(ResetKey))
         {
-            Reset();
+            Initialise();
         }
         
         if (!Paused || Input.GetKeyDown(NextCamPosKey))
@@ -42,35 +46,78 @@ public class CaptureManager : MonoBehaviour
         }
     }
 
-    public void Reset()
+    void Initialise()
     {
-        Areas.GenerateAll();
+        States = new CaptureStates();
+        States.SaveCheckpoint();
+        
+        Env.Generate();
 
         Started = false;
-        Paused = true;
+        Finished = false;
     }
 
     void Next()
     {
-        Cam.NextRotation(out bool looped);
-
-        // If all of the possible cam rotations have been seen,
-        // or the capture run has just started, go to the next position
-        if (looped || !Started)
+        var state = States.Current;
+        
+        Params.UpdateState(state);
+        
+        state.CamRotStepX++;
+        
+        if (state.CamRotStepX > Env.CamRotStepsX)
         {
-            var pos = Areas.NextCamPos();
+            state.CamRotStepX = 1;
+            state.CamRotStepY++;
+        }
+        
+        if (state.CamRotStepY > Env.CamRotStepsY)
+        {
+            state.CamRotStepY = 1;
+            state.CamPosStep++;
+        }
 
-            if (pos.HasValue)
+        var area = Env.Areas[state.AreaStep - 1];
+        if (state.CamPosStep > area.NumPos())
+        {
+            state.CamPosStep = 1;
+            state.AreaStep++;
+        }
+
+        if (state.AreaStep > Env.Areas.Length)
+        {
+            Finished = true;
+        }
+        
+        state.Capture++;
+        
+        // If we've reached the Capture batch size or the end of the Capture run...
+        if ((state.Capture-1) % Env.CaptureBatchSize == 0 || Finished)
+        {
+            bool lit = state.Lit;
+
+            if (lit)
             {
-                Cam.SetPosition(pos.Value);
+                // We still have unlit captures to take, so go back to last
+                // checkpoint and set finished to false
+                States.LoadCheckpoint();
+                Finished = false;
             }
             else
             {
-                // We've reached the end, so Reset the capture run
-                Reset();
+                // Lit and unlit captures have been taken, so save images here
             }
+
+            States.Current.Lit = !lit;
+            States.SaveCheckpoint();
         }
 
         Started = true;
+
+        if (Finished)
+        {
+            Paused = true;
+            Initialise();
+        }
     }
 }

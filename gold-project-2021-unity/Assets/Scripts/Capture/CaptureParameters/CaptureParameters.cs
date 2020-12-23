@@ -22,5 +22,7 @@ public class CaptureParameters : MonoBehaviour
         Cam.SetRotation(xPercentRot, yPercentRot);
 
         Lighting.SetLit(state.Lit);
+        
+        Cam.Render();
     }
 }

@@ -9,6 +9,7 @@ public class CaptureManager : MonoBehaviour
     [SerializeField] private CaptureStates States;
     [SerializeField] private CaptureEnvironment Env;
     [SerializeField] private CaptureParameters Params;
+    [SerializeField] private CaptureExport Export;
     
     [SerializeField] private CaptureCam Cam;
 
@@ -62,6 +63,7 @@ public class CaptureManager : MonoBehaviour
         var state = States.Current;
         
         Params.UpdateState(state);
+        Export.Export();
         
         state.CamRotStepX++;
         

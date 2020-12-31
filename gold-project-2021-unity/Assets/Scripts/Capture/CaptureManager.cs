@@ -63,7 +63,7 @@ public class CaptureManager : MonoBehaviour
         var state = States.Current;
         
         Params.UpdateState(state);
-        Export.Export();
+        Export.SaveImage();
         
         state.CamRotStepX++;
         
@@ -108,6 +108,7 @@ public class CaptureManager : MonoBehaviour
             else
             {
                 // Lit and unlit captures have been taken, so save images here
+                Export.Export();
             }
 
             States.Current.Lit = !lit;

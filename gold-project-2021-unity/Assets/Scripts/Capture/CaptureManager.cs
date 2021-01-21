@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 
 public class CaptureManager : MonoBehaviour
 {
@@ -104,11 +106,6 @@ public class CaptureManager : MonoBehaviour
                 // checkpoint and set finished to false
                 States.LoadCheckpoint();
                 Finished = false;
-            }
-            else
-            {
-                // Lit and unlit captures have been taken, so save images here
-                Export.Export();
             }
 
             States.Current.Lit = !lit;

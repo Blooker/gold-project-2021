@@ -12,6 +12,8 @@ public class CaptureCam : MonoBehaviour
     [SerializeField] private Vector2 RangeY;
 
     private Camera Cam;
+
+    private RenderTexture TargetTexture;
     
     private int RotationX;
     private int RotationY;
@@ -20,19 +22,17 @@ public class CaptureCam : MonoBehaviour
     {
         Cam = GetComponent<Camera>();
         
-        var targetTexture  = new RenderTexture(1920, 1080, 32);
-        targetTexture.name = "Capture";
-        targetTexture.enableRandomWrite = true;
-        targetTexture.Create();
+        TargetTexture  = new RenderTexture(Screen.width, Screen.height, 32);
+        TargetTexture.name = "Capture";
+        TargetTexture.enableRandomWrite = true;
+        TargetTexture.Create();
 
-        Cam.targetTexture = targetTexture;
-        Cam.enabled = false;
+        Cam.targetTexture = TargetTexture;
     }
 
     public RenderTexture Render()
     {
-        Cam.Render();
-        return Cam.targetTexture;
+        return TargetTexture;
     }
 
     public void SetPosition(Vector3 pos)

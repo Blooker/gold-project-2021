@@ -23,6 +23,5 @@ public class CaptureParameters : MonoBehaviour
 
         Lighting.SetLit(state.Lit);
         
-        Cam.Render();
     }
 }

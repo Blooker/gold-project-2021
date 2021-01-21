@@ -4,58 +4,71 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 public class CaptureExport : MonoBehaviour
 {
     [SerializeField] private CaptureCam Cam;
+    
+    [SerializeField] private string FolderPath;
+    [SerializeField] private RawImage Output;
 
-    private RenderTexture[] CaptureTextures;
-    private int RowIndex;
-
-    private int TextureCounter = 0;
+    [SerializeField] private Color TransparentColor;
+    [SerializeField] private float TransparencyThreshold;
+    
     private int FileCounter = 0;
-
-    private void Awake()
-    {
-        CaptureTextures = new RenderTexture[400];
-    }
 
     public void SaveImage()
     {
-        CaptureTextures[TextureCounter++] = Cam.Render();
+        var rt = Cam.Render();
+        Output.texture = rt;
+        StartCoroutine(SaveImageRoutine(rt));
     }
 
-    public void NextRow()
+    IEnumerator SaveImageRoutine(RenderTexture captureTexture)
     {
-        RowIndex++;
-    }
-    
-    public void Export()
-    {
-        var fileCounterOld = FileCounter;
-        var stopwatch = new Stopwatch();
+        yield return new WaitForEndOfFrame();
+
+        Texture2D image = new Texture2D(captureTexture.width, captureTexture.height);
+        image.ReadPixels(new Rect(0, 0, captureTexture.width, captureTexture.height), 0, 0);
+
+        bool empty = true;
         
-        stopwatch.Start();
-        for (int i = 0; i < CaptureTextures.Length; i++)
+        var pixels = image.GetPixels(0, 0, captureTexture.width, captureTexture.height);
+        for (int i = 0; i < pixels.Length; i++)
         {
-            var captureTexture = CaptureTextures[i];
-            
-            Texture2D image = new Texture2D(captureTexture.width, captureTexture.height);
-            image.ReadPixels(new Rect(0, 0, captureTexture.width, captureTexture.height), 0, 0);
-            image.Apply();
- 
-            var bytes = image.EncodeToPNG();
-            Destroy(image);
-            
-            File.WriteAllBytes(Application.dataPath + "/TestImages/" + FileCounter + ".png", bytes);
-            FileCounter++;
+            if (DistanceToTransparentColor(pixels[i]) < TransparencyThreshold)
+            {
+                int x = i % captureTexture.width;
+                int y = i / captureTexture.width;
+                
+                image.SetPixel(x,y,Color.clear);
+            }
+            else
+            {
+                empty = false;
+            }
         }
-        stopwatch.Stop();
         
-        Debug.Log($"Time to write {FileCounter - fileCounterOld} images: {stopwatch.ElapsedMilliseconds}ms");
+        if (empty)
+        {
+            Destroy(image);
+            yield break;
+        }
 
-        TextureCounter = 0;
-        RowIndex = 0;
+        image.Apply();
+ 
+        var bytes = image.EncodeToPNG();
+        Destroy(image);
+            
+        File.WriteAllBytes($"{FolderPath}/{FileCounter}.png", bytes);
+        FileCounter++;
+    }
+
+    float DistanceToTransparentColor(Color c)
+    {
+        var t = TransparentColor;
+        return (c.r - t.r) * (c.r - t.r) + (c.g - t.g) * (c.g - t.g) + (c.b - t.b) * (c.b - t.b);
     }
 }

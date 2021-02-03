@@ -38,16 +38,10 @@ public class CaptureExport : MonoBehaviour
         var pixels = image.GetPixels(0, 0, captureTexture.width, captureTexture.height);
         for (int i = 0; i < pixels.Length; i++)
         {
-            if (DistanceToTransparentColor(pixels[i]) < TransparencyThreshold)
-            {
-                int x = i % captureTexture.width;
-                int y = i / captureTexture.width;
-                
-                image.SetPixel(x,y,Color.clear);
-            }
-            else
+            if (DistanceToTransparentColor(pixels[i]) >= TransparencyThreshold)
             {
                 empty = false;
+                break;
             }
         }
         

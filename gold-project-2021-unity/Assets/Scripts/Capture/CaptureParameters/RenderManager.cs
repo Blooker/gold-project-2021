@@ -11,7 +11,7 @@ public class MaterialPair
     public Material UnlitMaterial;
 }
 
-public class LightingManager : MonoBehaviour
+public class RenderManager : MonoBehaviour
 {
     // private static Shader Lit;
     // private static Shader Unlit;
@@ -86,6 +86,19 @@ public class LightingManager : MonoBehaviour
             }
             Renderers[i].sharedMaterials = sharedMaterials;
         }
+    }
+
+    public bool AreObjectsVisible()
+    {
+        for (int i = 0; i < Renderers.Length; i++)
+        {
+            if (Renderers[i].isVisible)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     public void SetMaterials(Material[] mats, bool isLit) 

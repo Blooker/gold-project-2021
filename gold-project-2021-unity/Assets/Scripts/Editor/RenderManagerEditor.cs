@@ -7,8 +7,8 @@ using UnityEngine;
 // Live: https://gist.github.com/bzgeb/3800350
 // Archived: https://archive.is/Sc6kY
 
-[CustomEditor(typeof(LightingManager))]
-public class LightingManagerEditor : Editor
+[CustomEditor(typeof(RenderManager))]
+public class RenderManagerEditor : Editor
 {
     private SerializedObject obj;
 
@@ -40,7 +40,7 @@ public class LightingManagerEditor : Editor
 
     void PopulateMaterials(Object[] materialObjects, bool isLit)
     {
-        var lighting = target as LightingManager;
+        var lighting = target as RenderManager;
         if (lighting == null)
         {
             return;

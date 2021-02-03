@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CaptureParameters : MonoBehaviour
 {
     [SerializeField] private CaptureEnvironment Env;
     
     [SerializeField] private CaptureCam Cam;
-    [SerializeField] private LightingManager Lighting;
+    [SerializeField] private RenderManager Render;
     
-    public void UpdateState(CaptureState state)
+    public void UpdateState(CaptureState state, out bool objectsVisible)
     {
         var area = Env.Areas[state.AreaStep - 1];
 
@@ -21,7 +22,8 @@ public class CaptureParameters : MonoBehaviour
 
         Cam.SetRotation(xPercentRot, yPercentRot);
 
-        Lighting.SetLit(state.Lit);
-        
+        Render.SetLit(state.Lit);
+
+        objectsVisible = Render.AreObjectsVisible();
     }
 }

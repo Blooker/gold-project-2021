@@ -64,9 +64,13 @@ public class CaptureManager : MonoBehaviour
     {
         var state = States.Current;
         
-        Params.UpdateState(state);
-        Export.SaveImage();
-        
+        Params.UpdateState(state, out bool objectsVisible);
+
+        if (objectsVisible)
+        {
+            Export.SaveImage();
+        }
+
         state.CamRotStepX++;
         
         if (state.CamRotStepX > Env.CamRotStepsX)

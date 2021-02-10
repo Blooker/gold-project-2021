@@ -29,13 +29,14 @@ public class CaptureArea : MonoBehaviour
         return (int)GridResolution.x * (int)GridResolution.y * (int)GridResolution.z;
     }
     
-    public void Generate()
+    public void Generate(out int numPoints)
     {
         int numX = (int)GridResolution.x;
         int numY = (int)GridResolution.y;
         int numZ = (int)GridResolution.z;
-        
-        Positions = new Vector3[numX * numY * numZ];
+
+        numPoints = numX * numY * numZ;
+        Positions = new Vector3[numPoints];
         
         var spacePos = transform.position;
         var spaceScale = transform.localScale;

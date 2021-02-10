@@ -12,15 +12,20 @@ public class CaptureEnvironment : MonoBehaviour
     public int CamRotStepsX;
     public int CamRotStepsY;
 
-    [FormerlySerializedAs("ImageBatchSize")] [Header("Images")] public int CaptureBatchSize = 100;
+    public int CaptureBatchSize { get; private set; }
 
     public void Generate()
     {
+        int totalPoints = 0;
+        
         // Generate all CaptureAreas
         for (int i = 0; i < Areas.Length; i++)
         {
-            Areas[i].Generate();
+            Areas[i].Generate(out int numPoints);
+            totalPoints += numPoints;
         }
+
+        CaptureBatchSize = totalPoints * CamRotStepsX * CamRotStepsY;
     }
     
     public Vector3? GetPos(int areaIndex, int posIndex)

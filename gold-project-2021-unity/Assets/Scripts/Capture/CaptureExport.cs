@@ -10,6 +10,8 @@ using Debug = UnityEngine.Debug;
 public class CaptureExport : MonoBehaviour
 {
     [SerializeField] private CaptureCam Cam;
+
+    [SerializeField] private bool Export = true;
     
     [SerializeField] private string FolderPath;
     [SerializeField] private RawImage Output;
@@ -23,6 +25,10 @@ public class CaptureExport : MonoBehaviour
     {
         var rt = Cam.Render();
         Output.texture = rt;
+        
+        if (!Export)
+            return;
+        
         StartCoroutine(SaveImageRoutine(rt));
     }
 

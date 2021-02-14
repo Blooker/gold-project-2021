@@ -7,9 +7,12 @@ public class CaptureParameters : MonoBehaviour
     [SerializeField] private CaptureEnvironment Env;
     
     [SerializeField] private CaptureCam Cam;
-    [SerializeField] private RenderManager Render;
+    [SerializeField] private CaptureExport Export;
     
-    public void UpdateState(CaptureState state, out bool objectsVisible)
+    [SerializeField] private RenderManager Render;
+    [SerializeField] private PositionManager Position;
+    
+    public IEnumerator UpdateState(CaptureState state)
     {
         var area = Env.Areas[state.AreaStep - 1];
 
@@ -20,9 +23,25 @@ public class CaptureParameters : MonoBehaviour
         float yPercentRot = (state.CamRotStepY - 1) / (float)(Env.CamRotStepsY-1);
 
         Cam.SetRotation(xPercentRot, yPercentRot);
-
+        
         Render.SetLit(state.Lit);
-
-        objectsVisible = Render.AreObjectsVisible();
+        
+        if (Render.AreRenderersVisible())
+        {
+            yield return Cam.Render();
+            if (!Cam.IsRenderEmpty())
+            {
+                Export.ExportImage(Cam.RenderImage, state.Lit ? 0 : 1);
+                
+                if (state.Lit)
+                {
+                    Position.GenerateData(Cam.transform);
+                }
+                else
+                {
+                    Export.ExportPositions(Position.Data, Position.DataCount);
+                }
+            }
+        }
     }
 }

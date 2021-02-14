@@ -4,71 +4,82 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 public class CaptureExport : MonoBehaviour
 {
-    [SerializeField] private CaptureCam Cam;
-
     [SerializeField] private bool Export = true;
-    
-    [SerializeField] private string FolderPath;
-    [SerializeField] private RawImage Output;
+    [FormerlySerializedAs("FolderPaths")] [SerializeField] private string[] ImagePaths;
 
-    [SerializeField] private Color TransparentColor;
-    [SerializeField] private float TransparencyThreshold;
+    [SerializeField] private string PositionsPath;
+    private bool PositionsExported;
     
-    private int FileCounter = 0;
+    
+    private int[] FileCounters;
 
-    public void SaveImage()
+    private void Awake()
     {
-        var rt = Cam.Render();
-        Output.texture = rt;
-        
-        if (!Export)
-            return;
-        
-        StartCoroutine(SaveImageRoutine(rt));
+        FileCounters = new int[ImagePaths.Length];
     }
 
-    IEnumerator SaveImageRoutine(RenderTexture captureTexture)
+    public void ExportImage(Texture2D render, int pathIndex)
+    {
+        if (!Export)
+        {
+            return;
+        }
+        
+        StartCoroutine(ExportImageRoutine(render, pathIndex));
+    }
+
+    IEnumerator ExportImageRoutine(Texture2D image, int pathIndex)
     {
         yield return new WaitForEndOfFrame();
 
-        Texture2D image = new Texture2D(captureTexture.width, captureTexture.height);
-        image.ReadPixels(new Rect(0, 0, captureTexture.width, captureTexture.height), 0, 0);
-
-        bool empty = true;
-        
-        var pixels = image.GetPixels(0, 0, captureTexture.width, captureTexture.height);
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            if (DistanceToTransparentColor(pixels[i]) >= TransparencyThreshold)
-            {
-                empty = false;
-                break;
-            }
-        }
-        
-        if (empty)
-        {
-            Destroy(image);
-            yield break;
-        }
-
-        image.Apply();
- 
         var bytes = image.EncodeToPNG();
         Destroy(image);
-            
-        File.WriteAllBytes($"{FolderPath}/{FileCounter}.png", bytes);
-        FileCounter++;
+        
+        File.WriteAllBytes($"{ImagePaths[pathIndex]}/{FileCounters[pathIndex]}.png", bytes);
+        
+        FileCounters[pathIndex]++;
     }
 
-    float DistanceToTransparentColor(Color c)
+    public void ExportPositions(float[,,] data, int dataCount)
     {
-        var t = TransparentColor;
-        return (c.r - t.r) * (c.r - t.r) + (c.g - t.g) * (c.g - t.g) + (c.b - t.b) * (c.b - t.b);
+        if (PositionsExported)
+        {
+            return;
+        }
+        
+        try
+        {
+            using (StreamWriter file = new StreamWriter(PositionsPath, true))
+            {
+                for (int i = 0; i < dataCount; i++)
+                {
+                    var numPos =  data.GetLength(1);
+                    var record = "";
+                    for (int j = 0; j < numPos; j++)
+                    {
+                        record += $"{data[i, j, 0]},{data[i, j, 1]},{data[i, j, 2]}";
+
+                        if (j < numPos - 1)
+                        {
+                            record += ",";
+                        }
+                    }
+                    
+                    file.WriteLine(record);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("WHOOPS: ", e);
+        }
+
+        PositionsExported = true;
     }
 }

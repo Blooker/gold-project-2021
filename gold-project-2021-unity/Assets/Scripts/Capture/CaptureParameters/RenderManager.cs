@@ -88,7 +88,7 @@ public class RenderManager : MonoBehaviour
         }
     }
 
-    public bool AreObjectsVisible()
+    public bool AreRenderersVisible()
     {
         for (int i = 0; i < Renderers.Length; i++)
         {

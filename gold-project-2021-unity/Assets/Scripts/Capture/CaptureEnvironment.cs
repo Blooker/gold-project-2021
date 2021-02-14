@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,7 +13,12 @@ public class CaptureEnvironment : MonoBehaviour
     public int CamRotStepsX;
     public int CamRotStepsY;
 
-    public int CaptureBatchSize { get; private set; }
+    public static int CaptureBatchSize { get; private set; }
+
+    public void Start()
+    {
+        Generate();
+    }
 
     public void Generate()
     {
@@ -26,6 +32,7 @@ public class CaptureEnvironment : MonoBehaviour
         }
 
         CaptureBatchSize = totalPoints * CamRotStepsX * CamRotStepsY;
+        Debug.Log(CaptureBatchSize);
     }
     
     public Vector3? GetPos(int areaIndex, int posIndex)

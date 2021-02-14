@@ -11,10 +11,7 @@ public class CaptureManager : MonoBehaviour
     [SerializeField] private CaptureStates States;
     [SerializeField] private CaptureEnvironment Env;
     [SerializeField] private CaptureParameters Params;
-    [SerializeField] private CaptureExport Export;
     
-    [SerializeField] private CaptureCam Cam;
-
     [SerializeField] private bool Paused = false;
     
     [Header("Input")]
@@ -54,8 +51,6 @@ public class CaptureManager : MonoBehaviour
         States = new CaptureStates();
         States.SaveCheckpoint();
         
-        Env.Generate();
-
         Started = false;
         Finished = false;
     }
@@ -64,12 +59,7 @@ public class CaptureManager : MonoBehaviour
     {
         var state = States.Current;
         
-        Params.UpdateState(state, out bool objectsVisible);
-
-        if (objectsVisible)
-        {
-            Export.SaveImage();
-        }
+        StartCoroutine(Params.UpdateState(state));
 
         state.CamRotStepX++;
         
@@ -100,7 +90,7 @@ public class CaptureManager : MonoBehaviour
         state.Capture++;
         
         // If we've reached the Capture batch size or the end of the Capture run...
-        if ((state.Capture-1) % Env.CaptureBatchSize == 0 || Finished)
+        if ((state.Capture-1) % CaptureEnvironment.CaptureBatchSize == 0 || Finished)
         {
             bool lit = state.Lit;
 

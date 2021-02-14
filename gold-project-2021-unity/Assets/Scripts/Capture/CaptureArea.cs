@@ -6,6 +6,7 @@ using UnityEngine;
 public class CaptureArea : MonoBehaviour
 {
     [SerializeField] private Vector3 GridResolution;
+    [HideInInspector] public bool IsID;
     
     private Vector3[] Positions;
     
@@ -24,6 +25,11 @@ public class CaptureArea : MonoBehaviour
         return Positions[pos];
     }
 
+    public Vector3[] GetPos()
+    {
+        return Positions;
+    }
+
     public int NumPos()
     {
         return (int)GridResolution.x * (int)GridResolution.y * (int)GridResolution.z;
@@ -31,6 +37,11 @@ public class CaptureArea : MonoBehaviour
     
     public void Generate(out int numPoints)
     {
+        if (gameObject.name == "Capture_Area_3")
+        {
+            print("NICE");
+        }
+        
         int numX = (int)GridResolution.x;
         int numY = (int)GridResolution.y;
         int numZ = (int)GridResolution.z;
@@ -66,7 +77,7 @@ public class CaptureArea : MonoBehaviour
     
     private void OnDrawGizmos()
     {
-        // Gizmos.color = Color.magenta;
+        Gizmos.color = IsID ? Color.red : Color.white;
 
         Gizmos.DrawWireCube(transform.position, transform.localScale);
         

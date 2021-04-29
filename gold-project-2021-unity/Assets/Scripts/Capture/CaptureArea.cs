@@ -30,7 +30,7 @@ public class CaptureArea : MonoBehaviour
         return Positions;
     }
 
-    public int NumPos()
+    public int Length()
     {
         return (int)GridResolution.x * (int)GridResolution.y * (int)GridResolution.z;
     }

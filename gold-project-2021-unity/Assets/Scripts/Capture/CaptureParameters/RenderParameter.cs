@@ -11,30 +11,31 @@ public class MaterialPair
     public Material UnlitMaterial;
 }
 
-public class RenderManager : MonoBehaviour
+public class RenderParameter : CaptureParameter
 {
-    // private static Shader Lit;
-    // private static Shader Unlit;
+    public override float[] Output => null;
     
     [SerializeField] private MeshRenderer[] Renderers;
     [SerializeField] private MaterialPair[] MaterialPairs;
     
     private bool IsLit = true;
 
-    private Dictionary<Material, MaterialPair> MaterialMappings;
+    private Dictionary<string, MaterialPair[]> MaterialMappings;
     
     private void Awake()
     {
-        MaterialMappings = new Dictionary<Material, MaterialPair>();
+        MaterialMappings = new Dictionary<string, MaterialPair[]>();
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         for (int i = 0; i < Renderers.Length; i++)
         {
             var materials = Renderers[i].sharedMaterials;
-            
+            var pairs = new MaterialPair[materials.Length];
+
+            bool pairFound = false;
             for (int j = 0; j < materials.Length; j++)
             {
                 var mat = materials[j];
@@ -43,47 +44,40 @@ public class RenderManager : MonoBehaviour
                 {
                     if (MaterialPairs[k].LitMaterial == mat)
                     {
-                        try
-                        {
-                            MaterialMappings.Add(mat, MaterialPairs[k]);
-                        }
-                        catch (ArgumentException e)
-                        {
-                            
-                        }
-
+                        pairs[j] = MaterialPairs[k];
+                        pairFound = true;
                         break;
                     }
                 }
             }
-        }
-    }
-
-    public void SetLit(bool isLit)
-    {
-        if (IsLit == isLit)
-        {
-            return;
+            
+            if (pairFound)
+            {
+                MaterialMappings.Add(Renderers[i].name, pairs);
+            }
         }
         
-        IsLit = isLit;
+        base.Start();
+    }
+
+    protected override void UpdateParameter()
+    {
+        IsLit = Convert.ToBoolean(State);
+        // print($"RenderManager {State}");
+
         for (int i = 0; i < Renderers.Length; i++)
         {
             var sharedMaterials = Renderers[i].sharedMaterials;
-            for (int j = 0; j < Renderers[i].sharedMaterials.Length; j++)
+            if (MaterialMappings.TryGetValue(Renderers[i].name, out var pairs))
             {
-                var mat = sharedMaterials[j];
-
-                if (mat == null)
+                for (int j = 0; j < pairs.Length; j++)
                 {
-                    continue;
-                }
-                
-                if (MaterialMappings.TryGetValue(mat, out var pair))
-                {
+                    var pair = pairs[j];
                     sharedMaterials[j] = IsLit ? pair.LitMaterial : pair.UnlitMaterial;
+                    Debug.Log($"Material set {IsLit}");
                 }
             }
+
             Renderers[i].sharedMaterials = sharedMaterials;
         }
     }
@@ -121,5 +115,10 @@ public class RenderManager : MonoBehaviour
         }
 
         MaterialPairs = newPairs;
+    }
+
+    protected override int MaxState()
+    {
+        return 2;
     }
 }

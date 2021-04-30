@@ -17,9 +17,10 @@ public class PositionParameter : CaptureParameter
     private int AreaIndex = 0;
     private int StatePosOffset = 0;
     
-    private void Awake()
+    protected override void Start()
     {
         GeneratePositions();
+        base.Start();
     }
     
     protected override void UpdateParameter()

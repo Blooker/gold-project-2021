@@ -7,8 +7,8 @@ using UnityEngine;
 // Live: https://gist.github.com/bzgeb/3800350
 // Archived: https://archive.is/Sc6kY
 
-[CustomEditor(typeof(RenderManager))]
-public class RenderManagerEditor : Editor
+[CustomEditor(typeof(RenderParameter))]
+public class RenderParameterEditor : Editor
 {
     private SerializedObject obj;
 
@@ -40,7 +40,7 @@ public class RenderManagerEditor : Editor
 
     void PopulateMaterials(Object[] materialObjects, bool isLit)
     {
-        var lighting = target as RenderManager;
+        var lighting = target as RenderParameter;
         if (lighting == null)
         {
             return;

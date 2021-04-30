@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 
 public class CaptureParameters : MonoBehaviour
 {
     [SerializeField] private CaptureParameter[] Parameters;
-
+    
     public void Next(out bool allLooped)
     {
         allLooped = false;

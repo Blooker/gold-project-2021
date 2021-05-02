@@ -7,7 +7,7 @@ public class PositionParameter : CaptureParameter
 {
     public override float[] OutputData { get; } = new float[3];
 
-    protected override int MaxState => NumPos;
+    public override int MaxState => NumPos;
     
     [SerializeField] private CaptureArea[] Areas;
 

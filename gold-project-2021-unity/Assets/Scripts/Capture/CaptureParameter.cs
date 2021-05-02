@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class CaptureParameter : MonoBehaviour
 {
-    protected int State { get; private set; } = -1;
+    public int State { get; private set; } = -1;
 
     public void Next(out bool looped)
     {
@@ -28,7 +28,7 @@ public abstract class CaptureParameter : MonoBehaviour
 
     public abstract float[] OutputData { get; }
 
-    protected abstract int MaxState { get; }
+    public abstract int MaxState { get; }
     
     protected abstract void UpdateParameter();
 }

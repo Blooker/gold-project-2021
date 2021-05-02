@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+[System.Serializable]
+
 public class CaptureParameters : MonoBehaviour
 {
     [SerializeField] private CaptureParameter[] Parameters;
@@ -45,14 +47,16 @@ public class CaptureParameters : MonoBehaviour
             }
         }
 
-        if (allLooped)
+        InitialState = false;
+    }
+
+    public void Restart()
+    {
+        foreach (var parameter in Parameters)
         {
-            foreach (var parameter in Parameters)
-            {
-                parameter.Restart();
-            }
+            parameter.Restart();
         }
         
-        InitialState = allLooped;
+        InitialState = true;
     }
 }

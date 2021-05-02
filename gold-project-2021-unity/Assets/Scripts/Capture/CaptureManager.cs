@@ -8,36 +8,58 @@ using Debug = UnityEngine.Debug;
 
 public class CaptureManager : MonoBehaviour
 {
-    [FormerlySerializedAs("ParamsNew")] [SerializeField] private CaptureParameters Params;
-    
-    [SerializeField] private bool Paused = false;
+    [SerializeField] private CaptureParameters Params;
+
+    [SerializeField] private CaptureCam Cam;
+    [SerializeField] private CaptureExport Export;
     
     [Header("Input")]
-    [SerializeField] private KeyCode ResetKey;
     [SerializeField] private KeyCode NextCamPosKey;
     [SerializeField] private KeyCode PauseToggleKey;
 
-    // Update is called once per frame
-    void Update()
+    private bool Paused = true;
+
+    private void Start()
+    {
+        StartCoroutine(CaptureUpdate());
+    }
+
+    private void Update()
     {
         if (Input.GetKeyDown(PauseToggleKey))
         {
             Paused = !Paused;
         }
-
-        if (!Paused || Input.GetKeyDown(NextCamPosKey))
-        {
-            Next();
-        }
     }
 
-    void Next()
+    IEnumerator CaptureUpdate()
+    {
+        while (true)
+        {
+            if (!Paused || Input.GetKeyDown(NextCamPosKey))
+            {
+                yield return Next();
+            }
+            else
+            {
+                yield return null;
+            }
+        }
+    }
+    
+    IEnumerator Next()
     {
         Params.Next(out bool allLooped);
         
         if (allLooped)
         {
+            Params.Restart();
             Paused = true;
+
+            yield break;
         }
+
+        yield return Cam.Render();
+        yield return Export.ExportImage(Cam.RenderImage);
     }
 }

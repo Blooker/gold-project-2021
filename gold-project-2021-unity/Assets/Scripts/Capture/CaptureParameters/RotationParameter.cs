@@ -6,7 +6,7 @@ public class RotationParameter : CaptureParameter
 {
     public override float[] OutputData { get; } = new float[2];
     
-    protected override int MaxState => (int)RotationResolution.x * (int)RotationResolution.y;
+    public override int MaxState => (int)RotationResolution.x * (int)RotationResolution.y;
 
     [SerializeField] private Vector2 RotationResolution;
     

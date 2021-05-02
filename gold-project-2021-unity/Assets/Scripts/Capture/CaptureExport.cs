@@ -2,17 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
+[SuppressMessage("ReSharper", "MergeConditionalExpression")]
 public class CaptureExport : MonoBehaviour
 {
     [SerializeField] private bool Export = true;
-    [SerializeField] private string[] ImagePaths;
-
+    
+    [SerializeField] private string RootPath;
+    
+    [SerializeField] private CaptureParameter ImageSplitParameter;
+    
     [SerializeField] private string PositionsPath;
     private bool PositionsExported;
     
@@ -21,29 +26,30 @@ public class CaptureExport : MonoBehaviour
 
     private void Awake()
     {
-        FileCounters = new int[ImagePaths.Length];
+        int numCounters = ImageSplitParameter is null ? 1 : ImageSplitParameter.MaxState;
+        FileCounters = new int[numCounters];
     }
 
-    public void ExportImage(Texture2D render, int pathIndex)
+    private void Start()
+    {
+        CreateFolders();
+    }
+
+    public IEnumerator ExportImage(Texture2D image)
     {
         if (!Export)
         {
-            return;
+            yield break;
         }
         
-        StartCoroutine(ExportImageRoutine(render, pathIndex));
-    }
-
-    IEnumerator ExportImageRoutine(Texture2D image, int pathIndex)
-    {
         yield return new WaitForEndOfFrame();
 
         var bytes = image.EncodeToPNG();
         Destroy(image);
+
+        int state = ImageSplitParameter is null ? 0 : ImageSplitParameter.State;
         
-        File.WriteAllBytes($"{ImagePaths[pathIndex]}/{FileCounters[pathIndex]}.png", bytes);
-        
-        FileCounters[pathIndex]++;
+        File.WriteAllBytes($"{RootPath}/{state}/{FileCounters[state]++}.png", bytes);
     }
 
     public void ExportPositions(float[,,] data, int dataCount)
@@ -81,5 +87,15 @@ public class CaptureExport : MonoBehaviour
         }
 
         PositionsExported = true;
+    }
+
+    private void CreateFolders()
+    {
+        Directory.CreateDirectory(RootPath);
+        
+        for (int i = 0; i < FileCounters.Length; i++)
+        {
+            Directory.CreateDirectory($"{RootPath}/{i}");
+        }
     }
 }

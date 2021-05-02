@@ -15,7 +15,7 @@ public class RenderParameter : CaptureParameter
 {
     public override float[] OutputData => null;
     
-    protected override int MaxState => 2;
+    public override int MaxState => 2;
 
     [SerializeField] private MeshRenderer[] Renderers;
     [SerializeField] private MaterialPair[] MaterialPairs;

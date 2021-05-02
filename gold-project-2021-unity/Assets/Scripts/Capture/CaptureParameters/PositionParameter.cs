@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class PositionParameter : CaptureParameter
 {
-    public override float[] Output { get; } = new float[3];
+    public override float[] OutputData { get; } = new float[3];
 
+    protected override int MaxState => NumPos;
+    
     [SerializeField] private CaptureArea[] Areas;
 
     private int NumPos;
@@ -17,10 +19,9 @@ public class PositionParameter : CaptureParameter
     private int AreaIndex = 0;
     private int StatePosOffset = 0;
     
-    protected override void Start()
+    private void Start()
     {
         GeneratePositions();
-        base.Start();
     }
     
     protected override void UpdateParameter()
@@ -51,10 +52,6 @@ public class PositionParameter : CaptureParameter
         SetPosition(pos.Value);
     }
 
-    protected override int MaxState()
-    {
-        return NumPos;
-    }
     
     private void SetPosition(Vector3 pos)
     {
@@ -62,7 +59,7 @@ public class PositionParameter : CaptureParameter
         
         for (int i = 0; i < 3; i++)
         {
-            Output[i] = (pos[i] - MinPos[i]) / (MaxPos[i] - MinPos[i]);
+            OutputData[i] = (pos[i] - MinPos[i]) / (MaxPos[i] - MinPos[i]);
         }
     }
     

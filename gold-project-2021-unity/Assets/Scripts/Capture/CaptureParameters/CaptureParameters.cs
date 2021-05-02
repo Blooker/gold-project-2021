@@ -5,20 +5,54 @@ public class CaptureParameters : MonoBehaviour
 {
     [SerializeField] private CaptureParameter[] Parameters;
     
-    public void Next(out bool allLooped)
+    public float[] OutputData { get; private set; }
+
+    private bool InitialState = true;
+    
+    private void Start()
     {
-        allLooped = false;
-        
+        int outputLength = 0;
         for (int i = 0; i < Parameters.Length; i++)
         {
-            Parameters[i].Next(out bool looped);
+            // If this parameter's output data is not null, then add its length to the total
+            outputLength += Parameters[i].OutputData?.Length ?? 0;
+        }
+        
+        OutputData = new float[outputLength];
+    }
 
-            if (!looped)
+    public void Next(out bool allLooped)
+    {
+        allLooped = true;
+
+        int outputIndex = 0;
+        foreach (var parameter in Parameters)
+        {
+            parameter.Next(out bool looped);
+            allLooped &= looped;
+            
+            if (parameter.OutputData != null)
             {
-                return;
+                foreach (float output in parameter.OutputData)
+                {
+                    OutputData[outputIndex++] = output;
+                }
+            }
+            
+            if (!(InitialState || looped))
+            {
+                break;
             }
         }
 
-        allLooped = true;
+        if (allLooped)
+        {
+            foreach (var parameter in Parameters)
+            {
+                parameter.Restart();
+            }
+        }
+        
+        InitialState = allLooped;
     }
 }

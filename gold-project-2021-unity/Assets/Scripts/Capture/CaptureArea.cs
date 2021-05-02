@@ -37,11 +37,6 @@ public class CaptureArea : MonoBehaviour
     
     public void Generate(out int numPoints)
     {
-        if (gameObject.name == "Capture_Area_3")
-        {
-            print("NICE");
-        }
-        
         int numX = (int)GridResolution.x;
         int numY = (int)GridResolution.y;
         int numZ = (int)GridResolution.z;

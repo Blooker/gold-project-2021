@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class RotationParameter : CaptureParameter
 {
-    public override float[] Output { get; } = new float[2];
+    public override float[] OutputData { get; } = new float[2];
     
+    protected override int MaxState => (int)RotationResolution.x * (int)RotationResolution.y;
+
     [SerializeField] private Vector2 RotationResolution;
     
     [SerializeField] private Vector2 RangeX;
@@ -30,16 +32,9 @@ public class RotationParameter : CaptureParameter
         transform.localRotation = Quaternion.Euler(rotX, rotY, 0);
 
         var rangeXDiff = Mathf.Abs(RangeX.x - RangeX.y);
-        Output[0] = (rotX + rangeXDiff * 0.5f) / rangeXDiff;
+        OutputData[0] = (rotX + rangeXDiff * 0.5f) / rangeXDiff;
         
         var rangeYDiff = Mathf.Abs(RangeY.x - RangeY.y);
-        Output[1] = (rotY + rangeYDiff * 0.5f) / rangeYDiff;
-
-        Debug.Log($"{Output[0]}, {Output[1]}");
-    }
-    
-    protected override int MaxState()
-    {
-        return (int)RotationResolution.x * (int)RotationResolution.y;
+        OutputData[1] = (rotY + rangeYDiff * 0.5f) / rangeYDiff;
     }
 }

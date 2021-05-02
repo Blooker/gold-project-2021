@@ -13,8 +13,10 @@ public class MaterialPair
 
 public class RenderParameter : CaptureParameter
 {
-    public override float[] Output => null;
+    public override float[] OutputData => null;
     
+    protected override int MaxState => 2;
+
     [SerializeField] private MeshRenderer[] Renderers;
     [SerializeField] private MaterialPair[] MaterialPairs;
     
@@ -28,7 +30,7 @@ public class RenderParameter : CaptureParameter
     }
 
     // Start is called before the first frame update
-    protected override void Start()
+    private void Start()
     {
         for (int i = 0; i < Renderers.Length; i++)
         {
@@ -56,8 +58,6 @@ public class RenderParameter : CaptureParameter
                 MaterialMappings.Add(Renderers[i].name, pairs);
             }
         }
-        
-        base.Start();
     }
 
     protected override void UpdateParameter()
@@ -74,7 +74,6 @@ public class RenderParameter : CaptureParameter
                 {
                     var pair = pairs[j];
                     sharedMaterials[j] = IsLit ? pair.LitMaterial : pair.UnlitMaterial;
-                    Debug.Log($"Material set {IsLit}");
                 }
             }
 
@@ -115,10 +114,5 @@ public class RenderParameter : CaptureParameter
         }
 
         MaterialPairs = newPairs;
-    }
-
-    protected override int MaxState()
-    {
-        return 2;
     }
 }

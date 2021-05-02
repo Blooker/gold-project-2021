@@ -11,7 +11,7 @@ using Debug = UnityEngine.Debug;
 public class CaptureExport : MonoBehaviour
 {
     [SerializeField] private bool Export = true;
-    [FormerlySerializedAs("FolderPaths")] [SerializeField] private string[] ImagePaths;
+    [SerializeField] private string[] ImagePaths;
 
     [SerializeField] private string PositionsPath;
     private bool PositionsExported;

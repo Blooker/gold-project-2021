@@ -32,9 +32,9 @@ public class RotationParameter : CaptureParameter
         transform.localRotation = Quaternion.Euler(rotX, rotY, 0);
 
         var rangeXDiff = Mathf.Abs(RangeX.x - RangeX.y);
-        OutputData[0] = (rotX + rangeXDiff * 0.5f) / rangeXDiff;
+        OutputData[0] = (rotX - RangeX.x) / rangeXDiff;
         
         var rangeYDiff = Mathf.Abs(RangeY.x - RangeY.y);
-        OutputData[1] = (rotY + rangeYDiff * 0.5f) / rangeYDiff;
+        OutputData[1] = (rotY - RangeY.x) / rangeYDiff;
     }
 }

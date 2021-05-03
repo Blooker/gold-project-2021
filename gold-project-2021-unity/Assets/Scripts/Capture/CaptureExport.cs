@@ -4,10 +4,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
+
+class FileSplitInfo
+{
+    public int FileCounter;
+    public LinkedList<float[]> ParameterOutputData;
+
+    public FileSplitInfo()
+    {
+        ParameterOutputData = new LinkedList<float[]>();
+    }
+}
 
 [SuppressMessage("ReSharper", "MergeConditionalExpression")]
 public class CaptureExport : MonoBehaviour
@@ -18,16 +30,15 @@ public class CaptureExport : MonoBehaviour
     
     [SerializeField] private CaptureParameter ImageSplitParameter;
     
-    [SerializeField] private string PositionsPath;
-    private bool PositionsExported;
-    
-    
-    private int[] FileCounters;
+    private FileSplitInfo[] FileSplitInfo;
 
     private void Awake()
     {
-        int numCounters = ImageSplitParameter is null ? 1 : ImageSplitParameter.MaxState;
-        FileCounters = new int[numCounters];
+        FileSplitInfo = new FileSplitInfo[GetNumSplits()];
+        for (int i = 0; i < FileSplitInfo.Length; i++)
+        {
+            FileSplitInfo[i] = new FileSplitInfo();
+        }
     }
 
     private void Start()
@@ -47,37 +58,57 @@ public class CaptureExport : MonoBehaviour
         var bytes = image.EncodeToPNG();
         Destroy(image);
 
-        int state = ImageSplitParameter is null ? 0 : ImageSplitParameter.State;
+        int state = GetCurrentSplit();
         
-        File.WriteAllBytes($"{RootPath}/{state}/{FileCounters[state]++}.png", bytes);
+        File.WriteAllBytes($"{RootPath}/{state}/{FileSplitInfo[state].FileCounter++}.png", bytes);
     }
 
-    public void ExportPositions(float[,,] data, int dataCount)
+    public void AddParameterOutput(float[] parameterOutputs)
     {
-        if (PositionsExported)
+        var splitInfo = FileSplitInfo[GetCurrentSplit()];
+        var newNode = splitInfo.ParameterOutputData.AddLast(new float[parameterOutputs.Length]);
+
+        for (int i = 0; i < newNode.Value.Length; i++)
         {
-            return;
+            newNode.Value[i] = parameterOutputs[i];
         }
+    }
+    
+    public void ExportParameterOutputs()
+    {
+        for (int i = 0; i < FileSplitInfo.Length; i++)
+        {
+            ExportSplitParameterOutputs(i);
+        }
+    }
+
+    private void ExportSplitParameterOutputs(int splitIndex)
+    {
+        var splitInfo = FileSplitInfo[splitIndex];
+        var currentNode = splitInfo.ParameterOutputData.First;
+        int parameterCount = currentNode.Value.Length;
         
         try
         {
-            using (StreamWriter file = new StreamWriter(PositionsPath, true))
+            string path = $"{RootPath}/{splitIndex}.csv";
+            using (StreamWriter file = new StreamWriter(path, false))
             {
-                for (int i = 0; i < dataCount; i++)
+                while (currentNode != null)
                 {
-                    var numPos =  data.GetLength(1);
                     var record = "";
-                    for (int j = 0; j < numPos; j++)
+                    for (int j = 0; j < parameterCount; j++)
                     {
-                        record += $"{data[i, j, 0]},{data[i, j, 1]},{data[i, j, 2]}";
+                        record += $"{currentNode.Value[j]}";
 
-                        if (j < numPos - 1)
+                        if (j < parameterCount - 1)
                         {
                             record += ",";
                         }
                     }
                     
                     file.WriteLine(record);
+
+                    currentNode = currentNode.Next;
                 }
             }
         }
@@ -85,17 +116,25 @@ public class CaptureExport : MonoBehaviour
         {
             throw new Exception("WHOOPS: ", e);
         }
-
-        PositionsExported = true;
     }
 
     private void CreateFolders()
     {
         Directory.CreateDirectory(RootPath);
         
-        for (int i = 0; i < FileCounters.Length; i++)
+        for (int i = 0; i < FileSplitInfo.Length; i++)
         {
             Directory.CreateDirectory($"{RootPath}/{i}");
         }
+    }
+
+    private int GetCurrentSplit()
+    {
+        return ImageSplitParameter is null ? 0 : ImageSplitParameter.State;
+    }
+
+    private int GetNumSplits()
+    {
+        return ImageSplitParameter is null ? 1 : ImageSplitParameter.MaxState;
     }
 }

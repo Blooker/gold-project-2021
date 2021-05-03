@@ -32,7 +32,7 @@ public class CaptureManager : MonoBehaviour
         }
     }
 
-    IEnumerator CaptureUpdate()
+    private IEnumerator CaptureUpdate()
     {
         while (true)
         {
@@ -47,19 +47,27 @@ public class CaptureManager : MonoBehaviour
         }
     }
     
-    IEnumerator Next()
+    private IEnumerator Next()
     {
         Params.Next(out bool allLooped);
         
         if (allLooped)
         {
-            Params.Restart();
-            Paused = true;
-
+            Export.ExportParameterOutputs();
+            
+            Restart();
             yield break;
         }
 
         yield return Cam.Render();
         yield return Export.ExportImage(Cam.RenderImage);
+
+        Export.AddParameterOutput(Params.CurrentOutput);
+    }
+
+    private void Restart()
+    {
+        Params.Restart();
+        Paused = true;
     }
 }

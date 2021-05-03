@@ -6,8 +6,8 @@ using UnityEngine;
 public class CaptureParameters : MonoBehaviour
 {
     [SerializeField] private CaptureParameter[] Parameters;
-    
-    public float[] OutputData { get; private set; }
+
+    public float[] CurrentOutput { get; private set; }
 
     private bool InitialState = true;
     
@@ -16,11 +16,15 @@ public class CaptureParameters : MonoBehaviour
         int outputLength = 0;
         for (int i = 0; i < Parameters.Length; i++)
         {
-            // If this parameter's output data is not null, then add its length to the total
-            outputLength += Parameters[i].OutputData?.Length ?? 0;
+            var output = Parameters[i].OutputData;
+            if (output != null && output.Length > 0)
+            {
+                // If this parameter's output data is not null, then add its length to the total
+                outputLength += Parameters[i].OutputData.Length;
+            }
         }
         
-        OutputData = new float[outputLength];
+        CurrentOutput = new float[outputLength];
     }
 
     public void Next(out bool allLooped)
@@ -37,7 +41,7 @@ public class CaptureParameters : MonoBehaviour
             {
                 foreach (float output in parameter.OutputData)
                 {
-                    OutputData[outputIndex++] = output;
+                    CurrentOutput[outputIndex++] = output;
                 }
             }
             

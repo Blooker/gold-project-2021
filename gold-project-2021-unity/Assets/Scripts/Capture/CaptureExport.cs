@@ -46,14 +46,13 @@ public class CaptureExport : MonoBehaviour
         CreateFolders();
     }
 
-    public IEnumerator ExportImage(Texture2D image)
+    public void ExportImage(Texture2D image)
     {
         if (!Export)
         {
-            yield break;
+            return;
         }
         
-        yield return new WaitForEndOfFrame();
 
         var bytes = image.EncodeToPNG();
         Destroy(image);

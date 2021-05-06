@@ -60,8 +60,8 @@ public class CaptureManager : MonoBehaviour
         }
 
         yield return Cam.Render();
-        yield return Export.ExportImage(Cam.RenderImage);
-
+        
+        Export.ExportImage(Cam.RenderImage);
         Export.AddParameterOutput(Params.CurrentOutput);
     }
 
